@@ -68,8 +68,8 @@ document.querySelectorAll(".op-btn").forEach(btn => {
         if (lastInputType !== "number") return;
 
         let op = btn.textContent;
-        if (op === "x²") {
-            expression += "**2";
+        if (op === "ₓʸ") {
+            expression += "**";
         } else if (op === "√") {
             expression += "Math.sqrt(";
         } else if (op === "×") {
