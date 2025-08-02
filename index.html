@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
-    <title>Make it 10</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" sizes="32x32" href="image/Yuki.png">
+  <title>Make it 10 - Endless Mode</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <h1>Make it 10🎯 </h1>
-        <p class="instructions">Use all 4 numbers and operations to make 10! You have 60 seconds.</p>
+  <div class="game-container">
+    <h1>Make it 10 🎯</h1>
+    <p class="instructions">
+      Use all 4 numbers and operations to make 10!<br>
+      Get as many correct as you can in <strong>5:00</strong> minutes.
+    </p>
 
-        <div class="status">
-            <div>⏱ Time: <span id="timer">60</span>s</div>
-            <div>⭐ Score: <span id="score">0</span></div>
-        </div>
-
-        <div class="digits" id="digits"></div>
-
-        <div class="buttons">
-            <button class="op-btn">+</button>
-            <button class="op-btn">-</button>
-            <button class="op-btn">×</button>
-            <button class="op-btn">÷</button>
-            <button class="op-btn">ₓʸ</button>
-            <button class="op-btn">√</button>
-        </div>
-
-        <div class="expression" id="expression"></div>
-
-        <div class="controls">
-            <button id="clear">Clear</button>
-            <button id="submit">Submit</button>
-            <p class ="tribute">Inspired by Sydney Trains. Created by Joshua Ly</p>
-        </div>
-
-        <div class="message" id="message"></div>
-        <div class="game-over" id="game-over" style="display:none;">
-            <h2>Game Over!</h2>
-            <p>Your score: <span id="final-score"></span></p>
-            <button onclick="startGame()">Play Again</button>
-        </div>
+    <div class="status">
+      <div>⏱ Time: <span id="timer">5:00</span></div>
+      <div>⭐ Score: <span id="score">0</span></div>
     </div>
-    <script src="script.js"></script>
+
+    <div class="digits" id="digits"></div>
+
+    <div class="buttons">
+      <button class="op-btn">+</button>
+      <button class="op-btn">-</button>
+      <button class="op-btn">×</button>
+      <button class="op-btn">÷</button>
+      <button class="op-btn">ₓʸ</button>
+      <button class="op-btn">√</button>
+    </div>
+
+    <div class="expression" id="expression"></div>
+
+    <div class="controls">
+      <button id="clear">Clear</button>
+      <button id="submit">Submit</button>
+      <p class="tribute">Inspired by Sydney Trains. Created by Joshua Ly</p>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="game-over" id="game-over" style="display:none;">
+      <h2>Time's up!</h2>
+      <p>Your final score: <span id="final-score">0</span></p>
+      <button onclick="startGame()">Play Again</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

@@ -1,219 +1,203 @@
+const TOTAL_TIME = 300; // seconds 
+let timer = TOTAL_TIME;
+let score = 0;
 let digits = [];
 let expression = "";
 let usedDigits = [];
-let timer = 60;
-let score = 0;
-let gameInterval;
-let lastInputType = ""; 
 let usedExpressions = [];
+let gameInterval;
+let lastInputType = "";
 
+const timerDisplay      = document.getElementById('timer');
+const scoreDisplay      = document.getElementById('score');
+const digitsContainer   = document.getElementById('digits');
+const expressionDisplay = document.getElementById('expression');
+const messageDisplay    = document.getElementById('message');
+const gameOverScreen    = document.getElementById('game-over');
+const finalScoreDisplay = document.getElementById('final-score');
 
-const digitsContainer = document.getElementById("digits");
-const expressionDisplay = document.getElementById("expression");
-const timerDisplay = document.getElementById("timer");
-const scoreDisplay = document.getElementById("score");
-const messageDisplay = document.getElementById("message");
-const gameOverScreen = document.getElementById("game-over");
-const finalScoreDisplay = document.getElementById("final-score");
+const soundClick      = document.getElementById('sound-click');
+const soundCorrect    = document.getElementById('sound-correct');
+const soundIncorrect  = document.getElementById('sound-incorrect');
 
 function startGame() {
-    digits = generateRandomDigits();
-    expression = "";
-    usedDigits = [];
-    timer = 60;
-    score = 0;
-    lastInputType = "";
-
-    digitsContainer.innerHTML = "";
-    digits.forEach((num, index) => {
-        let btn = document.createElement("button");
-        btn.textContent = num;
-        btn.classList.add("digit-btn");
-        btn.dataset.index = index;
-        btn.addEventListener("click", () => addDigit(num, btn));
-        digitsContainer.appendChild(btn);
-    });
-
-    expressionDisplay.textContent = "";
-    scoreDisplay.textContent = score;
-    messageDisplay.textContent = "";
-    gameOverScreen.style.display = "none";
-
-    clearInterval(gameInterval);
-    gameInterval = setInterval(updateTimer, 1000);
+  clearInterval(gameInterval);
+  timer = TOTAL_TIME;
+  score = 0;
+  updateTimerDisplay();
+  scoreDisplay.textContent = score;
+  messageDisplay.textContent = '';
+  messageDisplay.className = 'message';
+  gameOverScreen.style.display = 'none';
+  loadNewDigits();
+  gameInterval = setInterval(tick, 1000);
 }
 
-function generateRandomDigits() {
-    let arr = [];
-    for (let i = 0; i < 4; i++) {
-        arr.push(Math.floor(Math.random() * 9) + 1);
-    }
-    return arr;
+// Countdown tick
+function tick() {
+  timer--;
+  if (timer <= 0) {
+    endGame();
+  } else {
+    updateTimerDisplay();
+  }
 }
 
+function updateTimerDisplay() {
+  const minutes = Math.floor(timer / 60);
+  const seconds = timer % 60;
+  timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2,'0')}`;
+}
+
+// Load a fresh set of 4 random digits
+function loadNewDigits() {
+  digits = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9) + 1);
+  expression = '';
+  usedDigits = [];
+  usedExpressions = [];
+  lastInputType = '';
+  expressionDisplay.textContent = '';
+  renderDigits();
+}
+
+// Render digit buttons
+function renderDigits() {
+  digitsContainer.innerHTML = '';
+  digits.forEach((n, idx) => {
+    const btn = document.createElement('button');
+    btn.textContent = n;
+    btn.classList.add('digit-btn');
+    btn.dataset.index = idx;
+    btn.addEventListener('click', () => { soundClick.play(); addDigit(n, btn); });
+    digitsContainer.appendChild(btn);
+  });
+}
+
+// Add a digit to the expression
 function addDigit(num, btn) {
-    if (lastInputType === "number") return;
+  if (lastInputType === 'number') return;
+  expression += num;
+  usedDigits.push(btn.dataset.index);
+  btn.disabled = true;
+  expressionDisplay.textContent = expression;
+  lastInputType = 'number';
+}
 
-    expression += num;
+// Operator buttons
+document.querySelectorAll('.op-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    soundClick.play();
+    if (lastInputType !== 'number') return;
+    const op = btn.textContent;
+    if (op === 'ₓʸ')       expression += '**';
+    else if (op === '√')  expression += 'Math.sqrt(';
+    else if (op === '×')  expression += '*';
+    else if (op === '÷')  expression += '/';
+    else                  expression += op;
     expressionDisplay.textContent = expression;
-
-    usedDigits.push(btn.dataset.index);
-    btn.disabled = true;
-
-    lastInputType = "number";
-}
-
-document.querySelectorAll(".op-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        if (lastInputType !== "number") return;
-
-        let op = btn.textContent;
-        if (op === "ₓʸ") {
-            expression += "**";
-        } else if (op === "√") {
-            expression += "Math.sqrt(";
-        } else if (op === "×") {
-            expression += "*";
-        } else if (op === "÷") {
-            expression += "/";
-        } else {
-            expression += op;
-        }
-
-        expressionDisplay.textContent = expression;
-        lastInputType = "operator";
-    });
+    lastInputType = 'operator';
+  });
 });
 
-document.getElementById("clear").addEventListener("click", () => {
-    expression = "";
-    expressionDisplay.textContent = "";
-    usedDigits = [];
-    lastInputType = "";
-    document.querySelectorAll(".digit-btn").forEach(btn => btn.disabled = false);
+// Clear button
+document.getElementById('clear').addEventListener('click', () => {
+  soundClick.play();
+  expression = '';
+  usedDigits = [];
+  expressionDisplay.textContent = '';
+  lastInputType = '';
+  document.querySelectorAll('.digit-btn').forEach(b => b.disabled = false);
 });
 
-document.getElementById("submit").addEventListener("click", () => {
-    const trimmedExpression = expression.trim();
-
-    try {
-        const result = eval(trimmedExpression);
-
-        if (result === 10 && usedDigits.length === 4) {
-            if (usedExpressions.includes(trimmedExpression)) {
-                messageDisplay.textContent = "⚠ Already used!";
-                messageDisplay.className = "message incorrect";
-            } else {
-                messageDisplay.textContent = "✅ Correct!";
-                messageDisplay.className = "message correct";
-                score++;
-                scoreDisplay.textContent = score;
-                usedExpressions.push(trimmedExpression);
-            }
-        } else {
-            messageDisplay.textContent = "❌ Incorrect!";
-            messageDisplay.className = "message incorrect";
-        }
-    } catch {
-        messageDisplay.textContent = "⚠ Invalid expression!";
-        messageDisplay.className = "message incorrect";
+// Submit button
+document.getElementById('submit').addEventListener('click', () => {
+  soundClick.play();
+  const expr = expression.trim();
+  try {
+    const result = eval(expr);
+    if (result === 10 && usedDigits.length === 4 && !usedExpressions.includes(expr)) {
+      soundCorrect.play();
+      score++;
+      scoreDisplay.textContent = score;
+      usedExpressions.push(expr);
+      messageDisplay.textContent = '✅ Correct!';
+      messageDisplay.className = 'message correct';
+      setTimeout(() => { messageDisplay.textContent = ''; messageDisplay.className = 'message'; }, 2000);
+      loadNewDigits();
+    } else {
+      soundIncorrect.play();
+      messageDisplay.textContent = '❌ Incorrect!';
+      messageDisplay.className = 'message incorrect';
+      setTimeout(() => { messageDisplay.textContent = ''; messageDisplay.className = 'message'; }, 2000);
     }
-
-    // Reset for next attempt
-    expression = "";
-    expressionDisplay.textContent = "";
-    usedDigits = [];
-    lastInputType = "";
-    document.querySelectorAll(".digit-btn").forEach(btn => btn.disabled = false);
+  } catch {
+    soundIncorrect.play();
+    messageDisplay.textContent = '⚠ Invalid!';
+    messageDisplay.className = 'message incorrect';
+    setTimeout(() => { messageDisplay.textContent = ''; messageDisplay.className = 'message'; }, 2000);
+  }
+  expression = '';
+  usedDigits = [];
+  lastInputType = '';
 });
 
-
-function updateTimer() {
-    timer--;
-    timerDisplay.textContent = timer;
-    if (timer <= 0) {
-        clearInterval(gameInterval);
-        endGame();
-    }
-}
-
+// End game when timer hits zero
 function endGame() {
-    finalScoreDisplay.textContent = score;
-    gameOverScreen.style.display = "block";
+  clearInterval(gameInterval);
+  finalScoreDisplay.textContent = score;
+  gameOverScreen.style.display = 'block';
 }
 
-// Keyboard interaction
-document.addEventListener("keydown", function (e) {
-    const key = e.key;
-
-    // Backspace = remove last
-    if (key === "Backspace" && expression.length > 0) {
-        expression = expression.slice(0, -1);
-        expressionDisplay.textContent = expression;
-
-        if (usedDigits.length > 0) {
-            const lastBtnIndex = usedDigits.pop();
-            const btn = document.querySelector(`.digit-btn[data-index="${lastBtnIndex}"]`);
-            if (btn) btn.disabled = false;
-        }
-
-        lastInputType = "";
-        return;
+// Keyboard support
+document.addEventListener('keydown', e => {
+  const key = e.key;
+  if (key === 'Backspace' && expression.length > 0) {
+    soundClick.play();
+    // only re-enable a digit if last input was a number
+    if (lastInputType === 'number') {
+      const lastIdx = usedDigits.pop();
+      const btn = document.querySelector(`.digit-btn[data-index="${lastIdx}"]`);
+      if (btn) btn.disabled = false;
     }
-
-    // Enter = submit
-    if (key === "Enter") {
-        document.getElementById("submit").click();
-        return;
+    expression = expression.slice(0, -1);
+    expressionDisplay.textContent = expression;
+    // update lastInputType based on remaining expression
+    if (!expression) lastInputType = '';
+    else {
+      const lc = expression.slice(-1);
+      lastInputType = /[0-9]/.test(lc) ? 'number' : 'operator';
     }
-
-    // Digit input (0-9)
-    if (/^[0-9]$/.test(key)) {
-        if (lastInputType === "number") return;
-
-        const digitButtons = Array.from(document.querySelectorAll('.digit-btn'));
-        const availableBtn = digitButtons.find(btn => btn.textContent === key && !btn.disabled);
-
-        if (availableBtn) {
-            expression += key;
-            expressionDisplay.textContent = expression;
-
-            usedDigits.push(availableBtn.dataset.index);
-            availableBtn.disabled = true;
-            lastInputType = "number";
-        }
-        return;
-    }
-
-    // Operators
-    if (['+', '-', '*', '/'].includes(key)) {
-        if (lastInputType !== "number") return;
-
-        expression += key;
-        expressionDisplay.textContent = expression;
-        lastInputType = "operator";
-        return;
-    }
-
-    // Power (^ = square)
-    if (key === "^") {
-        if (lastInputType !== "number") return;
-
-        expression += "**2";
-        expressionDisplay.textContent = expression;
-        lastInputType = "operator";
-        return;
-    }
-
-    // Square root (r = root)
-    if (key.toLowerCase() === "r") {
-        if (lastInputType === "number") return;
-
-        expression += "Math.sqrt(";
-        expressionDisplay.textContent = expression;
-        lastInputType = "operator";
-        return;
-    }
+    return;
+  }
+  if (key === 'Enter') { document.getElementById('submit').click(); return; }
+  if (/^[0-9]$/.test(key)) {
+    if (lastInputType === 'number') return;
+    const btn = Array.from(document.querySelectorAll('button.digit-btn'))
+      .find(b => b.textContent === key && !b.disabled);
+    if (btn) { soundClick.play(); addDigit(+key, btn); }
+    return;
+  }
+  if (['+', '-', '*', '/'].includes(key)) {
+    if (lastInputType !== 'number') return;
+    soundClick.play();
+    expression += key;
+    expressionDisplay.textContent = expression;
+    lastInputType = 'operator';
+    return;
+  }
+  if (key === '^' && lastInputType === 'number') {
+    soundClick.play();
+    expression += '**2';
+    expressionDisplay.textContent = expression;
+    lastInputType = 'operator';
+    return;
+  }
+  if (key.toLowerCase() === 'r' && lastInputType !== 'number') {
+    soundClick.play();
+    expression += 'Math.sqrt(';
+    expressionDisplay.textContent = expression;
+    lastInputType = 'operator';
+  }
 });
 
 startGame();
