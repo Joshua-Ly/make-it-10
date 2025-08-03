@@ -16,9 +16,9 @@ const messageDisplay    = document.getElementById('message');
 const gameOverScreen    = document.getElementById('game-over');
 const finalScoreDisplay = document.getElementById('final-score');
 
-const soundClick      = document.getElementById('sound-click');
-const soundCorrect    = document.getElementById('sound-correct');
-const soundIncorrect  = document.getElementById('sound-incorrect');
+// const soundClick      = document.getElementById('sound-click');
+// const soundCorrect    = document.getElementById('sound-correct');
+// const soundIncorrect  = document.getElementById('sound-incorrect');
 
 function startGame() {
   clearInterval(gameInterval);
@@ -49,7 +49,7 @@ function updateTimerDisplay() {
   timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2,'0')}`;
 }
 
-// Load a fresh set of 4 random digits
+// Pick a fresh set of 4 random digits
 function loadNewDigits() {
   digits = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9) + 1);
   expression = '';
@@ -60,7 +60,7 @@ function loadNewDigits() {
   renderDigits();
 }
 
-// Render digit buttons
+// Render buttons
 function renderDigits() {
   digitsContainer.innerHTML = '';
   digits.forEach((n, idx) => {
@@ -68,7 +68,7 @@ function renderDigits() {
     btn.textContent = n;
     btn.classList.add('digit-btn');
     btn.dataset.index = idx;
-    btn.addEventListener('click', () => { soundClick.play(); addDigit(n, btn); });
+    btn.addEventListener('click', () => {addDigit(n, btn); });
     digitsContainer.appendChild(btn);
   });
 }
@@ -86,7 +86,7 @@ function addDigit(num, btn) {
 // Operator buttons
 document.querySelectorAll('.op-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    soundClick.play();
+    // soundClick.play();
     if (lastInputType !== 'number') return;
     const op = btn.textContent;
     if (op === 'ₓʸ')       expression += '**';
@@ -101,7 +101,7 @@ document.querySelectorAll('.op-btn').forEach(btn => {
 
 // Clear button
 document.getElementById('clear').addEventListener('click', () => {
-  soundClick.play();
+  // soundClick.play();
   expression = '';
   usedDigits = [];
   expressionDisplay.textContent = '';
@@ -111,12 +111,12 @@ document.getElementById('clear').addEventListener('click', () => {
 
 // Submit button
 document.getElementById('submit').addEventListener('click', () => {
-  soundClick.play();
+  // soundClick.play();
   const expr = expression.trim();
   try {
     const result = eval(expr);
     if (result === 10 && usedDigits.length === 4 && !usedExpressions.includes(expr)) {
-      soundCorrect.play();
+      //soundCorrect.play();
       score++;
       scoreDisplay.textContent = score;
       usedExpressions.push(expr);
@@ -125,13 +125,13 @@ document.getElementById('submit').addEventListener('click', () => {
       setTimeout(() => { messageDisplay.textContent = ''; messageDisplay.className = 'message'; }, 2000);
       loadNewDigits();
     } else {
-      soundIncorrect.play();
+      // soundIncorrect.play();
       messageDisplay.textContent = '❌ Incorrect!';
       messageDisplay.className = 'message incorrect';
       setTimeout(() => { messageDisplay.textContent = ''; messageDisplay.className = 'message'; }, 2000);
     }
   } catch {
-    soundIncorrect.play();
+    //soundIncorrect.play();
     messageDisplay.textContent = '⚠ Invalid!';
     messageDisplay.className = 'message incorrect';
     setTimeout(() => { messageDisplay.textContent = ''; messageDisplay.className = 'message'; }, 2000);
@@ -152,7 +152,7 @@ function endGame() {
 document.addEventListener('keydown', e => {
   const key = e.key;
   if (key === 'Backspace' && expression.length > 0) {
-    soundClick.play();
+    // soundClick.play();
     // only re-enable a digit if last input was a number
     if (lastInputType === 'number') {
       const lastIdx = usedDigits.pop();
@@ -174,26 +174,26 @@ document.addEventListener('keydown', e => {
     if (lastInputType === 'number') return;
     const btn = Array.from(document.querySelectorAll('button.digit-btn'))
       .find(b => b.textContent === key && !b.disabled);
-    if (btn) { soundClick.play(); addDigit(+key, btn); }
+    if (btn) {addDigit(+key, btn); }
     return;
   }
   if (['+', '-', '*', '/'].includes(key)) {
     if (lastInputType !== 'number') return;
-    soundClick.play();
+    // soundClick.play();
     expression += key;
     expressionDisplay.textContent = expression;
     lastInputType = 'operator';
     return;
   }
   if (key === '^' && lastInputType === 'number') {
-    soundClick.play();
+    // soundClick.play();
     expression += '**2';
     expressionDisplay.textContent = expression;
     lastInputType = 'operator';
     return;
   }
   if (key.toLowerCase() === 'r' && lastInputType !== 'number') {
-    soundClick.play();
+    // soundClick.play();
     expression += 'Math.sqrt(';
     expressionDisplay.textContent = expression;
     lastInputType = 'operator';
