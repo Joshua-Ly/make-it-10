@@ -87,7 +87,7 @@
 
 ## Feedback
 
-I love receiving feedback, doing so with open arms. If there are any additonal feature that should bea added to improvide functionaltiy and overall experience for the user, feel free to email me at lyjoshua8@gmail.com.
+I love and appreciate feedback at any scale. If there are any additonal feature that should be added to improve functionaltiy and overall experience for the user, feel free to email me at lyjoshua8@gmail.com.
 
 ---
 
